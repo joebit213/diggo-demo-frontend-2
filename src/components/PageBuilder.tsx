@@ -3,15 +3,11 @@ import { Servicios } from './sections/Servicios'
 import { Proyectos } from './sections/Proyectos'
 import { Contacto } from './sections/Contacto'
 
-interface Section {
-  _key: string
-  _type: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SectionData = Record<string, any>
 
 interface PageBuilderProps {
-  sections: Section[] | null
+  sections: SectionData[] | null
 }
 
 export function PageBuilder({ sections }: PageBuilderProps) {
