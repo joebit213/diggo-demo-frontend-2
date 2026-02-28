@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { urlFor } from '@/sanity/lib/image'
 
 interface Proyecto {
   _id: string
@@ -8,8 +9,24 @@ interface Proyecto {
   slug?: string
   cliente?: string
   descripcion?: string
-  imagen?: { asset?: { url?: string } }
+  imagen?: {
+    asset?: { _ref?: string; _id?: string; url?: string }
+    hotspot?: { x: number; y: number }
+    crop?: { top: number; bottom: number; left: number; right: number }
+  }
   categoria?: string
+}
+
+// Helper para URL de proyecto optimizado en WebP (4:3)
+function getProjectImageUrl(imagen: Proyecto['imagen']): string | null {
+  if (!imagen?.asset) return null
+  return urlFor(imagen)
+    .width(800)
+    .height(600)
+    .fit('crop')
+    .format('webp')
+    .quality(85)
+    .url()
 }
 
 interface ProyectosProps {
@@ -86,12 +103,13 @@ export function Proyectos({ data }: ProyectosProps) {
               key={proyecto._id}
               className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-200"
             >
-              {/* Image */}
-              {proyecto.imagen?.asset?.url && (
+              {/* Image - WebP optimizado */}
+              {proyecto.imagen?.asset && (
                 <img
-                  src={proyecto.imagen.asset.url}
+                  src={getProjectImageUrl(proyecto.imagen) || ''}
                   alt={proyecto.titulo}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  loading="lazy"
                 />
               )}
 

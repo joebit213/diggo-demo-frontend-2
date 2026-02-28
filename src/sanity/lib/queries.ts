@@ -1,3 +1,4 @@
+// Query para Home - incluye hotspot y crop para imágenes
 export const HOME_QUERY = `*[_type == "home"][0]{
   _id,
   titulo,
@@ -15,7 +16,12 @@ export const HOME_QUERY = `*[_type == "home"][0]{
         descripcion,
         morphTextoFijo,
         morphPalabras,
-        imagen { asset->{ _id, url } },
+        // Imagen con hotspot y crop para recorte inteligente
+        imagen {
+          asset->,
+          hotspot,
+          crop
+        },
         ctaTexto,
         ctaLink,
         colorPrimario,
@@ -36,7 +42,11 @@ export const HOME_QUERY = `*[_type == "home"][0]{
         _key,
         nombre,
         descripcion,
-        icono { asset->{ url } },
+        icono {
+          asset->,
+          hotspot,
+          crop
+        },
         link
       },
       layout
@@ -53,7 +63,11 @@ export const HOME_QUERY = `*[_type == "home"][0]{
         "slug": slug.current,
         cliente,
         descripcion,
-        imagen { asset->{ url } },
+        imagen {
+          asset->,
+          hotspot,
+          crop
+        },
         categoria
       },
       layout,

@@ -1,9 +1,25 @@
+import { urlFor } from '@/sanity/lib/image'
+
 interface Servicio {
   _key: string
   nombre: string
   descripcion?: string
-  icono?: { asset?: { url?: string } }
+  icono?: {
+    asset?: { _ref?: string; _id?: string; url?: string }
+  }
   link?: string
+}
+
+// Helper para URL de icono optimizado
+function getIconUrl(icono: Servicio['icono']): string | null {
+  if (!icono?.asset) return null
+  return urlFor(icono)
+    .width(120)
+    .height(120)
+    .fit('crop')
+    .format('webp')
+    .quality(90)
+    .url()
 }
 
 interface ServiciosProps {
@@ -49,12 +65,13 @@ export function Servicios({ data }: ServiciosProps) {
               key={servicio._key}
               className="group p-8 bg-gray-50 rounded-2xl hover:bg-gray-900 transition-colors duration-300"
             >
-              {/* Icon */}
-              {servicio.icono?.asset?.url ? (
+              {/* Icon - WebP optimizado */}
+              {servicio.icono?.asset ? (
                 <img
-                  src={servicio.icono.asset.url}
+                  src={getIconUrl(servicio.icono) || ''}
                   alt={servicio.nombre}
-                  className="w-12 h-12 mb-6 group-hover:brightness-0 group-hover:invert transition"
+                  className="w-12 h-12 mb-6 object-contain group-hover:brightness-0 group-hover:invert transition"
+                  loading="lazy"
                 />
               ) : (
                 <div className="w-12 h-12 mb-6 rounded-lg bg-gray-200 group-hover:bg-gray-700" />

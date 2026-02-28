@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { urlFor } from '@/sanity/lib/image'
 
 interface Slide {
   _key: string
@@ -9,11 +10,27 @@ interface Slide {
   descripcion?: string
   morphTextoFijo?: string
   morphPalabras?: string[]
-  imagen?: { asset?: { url?: string } }
+  imagen?: {
+    asset?: { _ref?: string; _id?: string; url?: string }
+    hotspot?: { x: number; y: number }
+    crop?: { top: number; bottom: number; left: number; right: number }
+  }
   ctaTexto?: string
   ctaLink?: string
   colorPrimario?: string
   colorSecundario?: string
+}
+
+// Helper para generar URL de imagen Hero optimizada en WebP
+function getHeroImageUrl(imagen: Slide['imagen']): string | null {
+  if (!imagen?.asset) return null
+  return urlFor(imagen)
+    .width(1920)
+    .height(1080)
+    .fit('crop')
+    .format('webp')
+    .quality(85)
+    .url()
 }
 
 interface HeroProps {
@@ -62,11 +79,11 @@ export function Hero({ data }: HeroProps) {
 
   return (
     <section className="relative h-screen overflow-hidden bg-gray-900">
-      {/* Background Image */}
-      {slide?.imagen?.asset?.url && (
+      {/* Background Image - Optimizado en WebP */}
+      {slide?.imagen?.asset && (
         <div
           className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
-          style={{ backgroundImage: `url(${slide.imagen.asset.url})` }}
+          style={{ backgroundImage: `url(${getHeroImageUrl(slide.imagen)})` }}
         >
           <div className="absolute inset-0 bg-black/50" />
         </div>
