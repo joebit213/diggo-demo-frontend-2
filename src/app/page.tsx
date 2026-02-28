@@ -2,19 +2,11 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { HOME_QUERY } from "@/sanity/lib/queries";
 import { PageBuilder } from "@/components/PageBuilder";
 
-interface HomeData {
-  _id: string;
-  titulo?: string;
-  descripcion?: string;
-  secciones?: Array<{
-    _key: string;
-    _type: string;
-    [key: string]: unknown;
-  }>;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type HomeData = any;
 
 export default async function HomePage() {
-  const { data } = await sanityFetch<HomeData | null>({ query: HOME_QUERY });
+  const { data } = await sanityFetch({ query: HOME_QUERY });
 
-  return <PageBuilder sections={data?.secciones ?? null} />;
+  return <PageBuilder sections={(data as HomeData)?.secciones ?? null} />;
 }
