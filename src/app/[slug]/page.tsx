@@ -1,4 +1,5 @@
 import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/lib/client";
 import { PageBuilder } from "@/components/PageBuilder";
 import { notFound } from "next/navigation";
 
@@ -94,12 +95,11 @@ const SLUGS_QUERY = `*[_type == "pagina" && defined(slug.current)][].slug.curren
 type PageData = any;
 
 // Generar rutas estáticas en build time
+// Usa client directamente porque no hay request context en build time
 export async function generateStaticParams() {
-  const { data: slugs } = await sanityFetch({
-    query: SLUGS_QUERY,
-  });
+  const slugs = await client.fetch<string[]>(SLUGS_QUERY);
 
-  return (slugs as string[] || []).map((slug) => ({
+  return (slugs || []).map((slug) => ({
     slug,
   }));
 }
