@@ -1,6 +1,8 @@
 import { client } from './client'
 import { draftMode } from 'next/headers'
 
+const token = process.env.SANITY_API_READ_TOKEN
+
 // Manual sanityFetch implementation (compatible with all next-sanity versions)
 export async function sanityFetch<T>({
   query,
@@ -13,11 +15,15 @@ export async function sanityFetch<T>({
 }): Promise<{ data: T }> {
   const isDraftMode = (await draftMode()).isEnabled
 
-  const result = await client.fetch<T>(query, params, {
+  // Use token for draft mode to read unpublished content
+  const fetchClient = isDraftMode && token
+    ? client.withConfig({ token, useCdn: false })
+    : client
+
+  const result = await fetchClient.fetch<T>(query, params, {
     perspective: isDraftMode ? 'previewDrafts' : 'published',
-    useCdn: !isDraftMode,
     stega: isDraftMode,
-    ...(isDraftMode ? {} : { next: { tags, revalidate: 60 } }),
+    ...(isDraftMode ? { cache: 'no-store' } : { next: { tags, revalidate: 60 } }),
   })
 
   return { data: result }
